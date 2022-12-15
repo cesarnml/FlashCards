@@ -11,34 +11,36 @@ type Card = {
   english: string
 }
 
-let cards: Card[] = []
-
-fetch(rawData)
-  .then((r) => r.text())
-  .then((text) => {
-    const div = document.createElement('div')
-    div.innerHTML = text
-    const convertedData: Record<string, string[]> = {}
-    keys.forEach((key) => {
-      convertedData[key] = [...div.querySelectorAll(`.${key}`)].map((node) => node.textContent?.trim()) as string[]
-    })
-    const cardCount = convertedData['title'].length
-    cards = Array(cardCount)
-      .fill(null)
-      .map((_, index) => {
-        const result = {}
-        keys.forEach((key) => {
-          result[key] = convertedData[key][index] as any
-        })
-        return result as Card
+const fetchCards = async () => {
+  return fetch(rawData)
+    .then((r) => r.text())
+    .then((text) => {
+      const div = document.createElement('div')
+      div.innerHTML = text
+      const convertedData: Record<string, string[]> = {}
+      keys.forEach((key) => {
+        convertedData[key] = [...div.querySelectorAll(`.${key}`)].map((node) => node.textContent?.trim()) as string[]
       })
-  })
-
+      const cardCount = convertedData['title'].length
+      return Array(cardCount)
+        .fill(null)
+        .map((_, index) => {
+          const result = {}
+          keys.forEach((key) => {
+            result[key] = convertedData[key][index] as any
+          })
+          return result as Card
+        })
+    })
+}
 function App() {
+  const [cards, setCards] = useState([])
   const [currentCardIndex, setCurrentCardIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
-  const currentCard = cards[currentCardIndex]
-  const isReversed = currentCard.title.includes('English')
+
+  useEffect(() => {
+    fetchCards().then(setCards)
+  }, [])
 
   useEffect(() => {
     // First we get the viewport height and we multiple it by 1% to get a value for a vh unit
@@ -58,6 +60,10 @@ function App() {
     }
   }
 
+  if (!cards.length) {
+    return null
+  }
+
   return (
     <div
       className='app prose container mx-auto flex flex-col justify-start items-stretch w-screen'
@@ -67,11 +73,15 @@ function App() {
       <div className='card mt-40 bg-base-100'>
         <div className='card-body items-center'>
           <h1 className='card-title text-4xl'>
-            {isReversed ? cards[currentCardIndex].phonetic : cards[currentCardIndex].english}
+            {cards[currentCardIndex].title.includes('English')
+              ? cards[currentCardIndex].phonetic
+              : cards[currentCardIndex].english}
           </h1>
           {showAnswer && (
             <p className='text-2xl'>
-              {isReversed ? cards[currentCardIndex].english : cards[currentCardIndex].phonetic}
+              {cards[currentCardIndex].title.includes('English')
+                ? cards[currentCardIndex].english
+                : cards[currentCardIndex].phonetic}
             </p>
           )}
         </div>
