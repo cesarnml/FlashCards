@@ -40,7 +40,7 @@ function App() {
 
   useEffect(() => {
     fetchCards().then(setCards)
-  }, [])
+  }, [currentCardIndex])
 
   useEffect(() => {
     // First we get the viewport height and we multiple it by 1% to get a value for a vh unit
@@ -66,7 +66,7 @@ function App() {
 
   return (
     <div
-      className='app prose container mx-auto flex flex-col justify-start items-stretch w-screen'
+      className='app prose container mx-auto flex flex-col justify-start items-stretch w-screen h-full'
       onClick={onShowAnswer}
     >
       <p className='pt-32 text-2xl font-bold text-center'>{cards[currentCardIndex].title}</p>
@@ -77,12 +77,14 @@ function App() {
               ? cards[currentCardIndex].phonetic
               : cards[currentCardIndex].english}
           </h1>
-          {showAnswer && (
+          {showAnswer ? (
             <p className='text-2xl'>
               {cards[currentCardIndex].title.includes('English')
                 ? cards[currentCardIndex].english
                 : cards[currentCardIndex].phonetic}
             </p>
+          ) : (
+            <button className='btn btn-info'>Show Answer</button>
           )}
         </div>
       </div>
