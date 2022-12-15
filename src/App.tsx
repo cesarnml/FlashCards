@@ -4,7 +4,16 @@ import rawData from './assets/data/J1-Chapter10.txt'
 
 const keys = ['title', 'phonetic', 'answer', 'english']
 
-const cards = fetch(rawData)
+type Card = {
+  title: string
+  phonetic: string
+  answer: string
+  english: string
+}
+
+let cards: Card[] = []
+
+fetch(rawData)
   .then((r) => r.text())
   .then((text) => {
     const div = document.createElement('div')
@@ -14,16 +23,15 @@ const cards = fetch(rawData)
       convertedData[key] = [...div.querySelectorAll(`.${key}`)].map((node) => node.textContent?.trim()) as string[]
     })
     const cardCount = convertedData['title'].length
-    const cardJSON = Array(cardCount)
+    cards = Array(cardCount)
       .fill(null)
       .map((_, index) => {
-        const result: Record<string, string> = {}
+        const result = {}
         keys.forEach((key) => {
-          result[key] = convertedData[key][index]
+          result[key] = convertedData[key][index] as any
         })
-        return result
+        return result as Card
       })
-    return cardJSON
   })
 
 function App() {
