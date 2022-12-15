@@ -4,7 +4,7 @@ import rawData from './assets/data/J1-Chapter10.txt'
 
 const keys = ['title', 'phonetic', 'answer', 'english']
 
-const cards = await fetch(rawData)
+const cards = fetch(rawData)
   .then((r) => r.text())
   .then((text) => {
     const div = document.createElement('div')
